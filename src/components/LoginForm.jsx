@@ -1,25 +1,44 @@
 import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
+import {  initializeApp } from "firebase/app"
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import { useState } from "react"
 
+const firebaseConfig = {
+    apiKey: "AIzaSyBwM8QBNLeXg2pxlQ_OP2vYBXu0Gw8eHog",
+    authDomain: "timber-login-jch.firebaseapp.com",
+    projectId: "timber-login-jch",
+    storageBucket: "timber-login-jch.appspot.com",
+    messagingSenderId: "751414137333",
+    appId: "1:751414137333:web:8e58ad27013505e30350bc"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app)
 
 export default function LoginForm() {
- const [email, setEmail] = useState()
- const [password, setPassword] = useState()
+ const [email, setEmail] = useState('')
+ const [password, setPassword] = useState('')
+ const [user, setUser] = useState()
 
- const handleForm = (e) => {
-    const newValue = e.target.value.trim()
-    console.log(e.target, newValue)
+ const handleLogin = async (e) => {
+    e.preventDefault()
+    const response = await signInWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message))
+        setUser(response.user)
+ }
+ if (user) {
+    return <h2>Welcome User! {user.uid}</h2>
  }
     return (
         <>
-        <Form>
+        <Form onSubmit={handleLogin}>
             <Form.Group className="mb-3">
                 <Form.Label>Email Address</Form.Label>
                 <Form.Control
                  type="email"
-                 placeholder="Enter Email"
-                 onChange={handleForm}/>
+                 placeholder="Enter Email" 
+                 value={email} onChange={ e => setEmail(e.target.value)}/>
                 <Form.Text>We'll never share your email with anyone else.</Form.Text>
             </Form.Group>
 
@@ -28,7 +47,7 @@ export default function LoginForm() {
                 <Form.Control 
                 type="password"
                 placeholder="Enter Password"
-                onChange={handleForm}/>
+                value={password} onChange={e => setPassword(e.target.value)}/>
             </Form.Group>
 
             <Form.Group>
